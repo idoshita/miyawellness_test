@@ -24,4 +24,3 @@ services:
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
-    autoDeploy: true
