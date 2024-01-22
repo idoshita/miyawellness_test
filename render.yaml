@@ -11,7 +11,7 @@ services:
     runtime: python
     region: singapore
     plan: free
-    branch: master
+    branch: main
     healthCheckPath: /
     buildCommand: "./build.sh"
     startCommand: "gunicorn mysite.wsgi:application"
