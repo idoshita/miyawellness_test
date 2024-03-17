@@ -1,6 +1,12 @@
-db.sqlite3
+*.log
+*.env
+*.pyc
+*.swp
+.DS_Store
+.devcontainer
 .vscode
 __pycache__
-*.pyc
-.DS_Store
-.env
+db.sqlite3
+media
+tmp
+*myvenv

@@ -16,14 +16,11 @@
         <div class="container">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                <a class="nav-link" href="/">ホーム</a>
+                    <a class="nav-link" href="{% url 'attendance' %}">出勤打刻</a>
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                 <a class="nav-link" href="{% url 'profile' %}">プロフィール</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link" href="{% url 'attendance' %}">出勤打刻</a>
                 </li>
                 {% if user.is_staff %}
                 <li class="nav-item">

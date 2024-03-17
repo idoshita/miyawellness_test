@@ -9,7 +9,6 @@ from django import forms
 from django.views.generic.edit import FormView
 from datetime import timedelta, datetime
 from django.contrib.auth import get_user_model
-from django.http import Http404
 
 
 
@@ -20,12 +19,12 @@ class IndexView(TemplateView):
 
 
 
-class AttendanceView(View):
+class AttendanceView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'app/attendance.html')
 
 
-class StatusView(View):
+class StatusView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         user_day = AttendanceModels.objects.filter(user=self.request.user)
         current_datetime = timezone.now().date()
@@ -82,7 +81,7 @@ class StatusView(View):
 
 
 
-class AllStatusView(View):
+class AllStatusView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         users = get_user_model().objects.all()
 
@@ -150,7 +149,7 @@ class AllStatusView(View):
 
 
 
-class CorrectionView(View):
+class CorrectionView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         users = get_user_model().objects.all()
 
@@ -258,8 +257,6 @@ class StartView(FormView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-
-
 class EndView(FormView):
     template_name = 'app/attendance.html'
     form_class = EndForm
@@ -268,12 +265,20 @@ class EndView(FormView):
     def form_valid(self, form):
         try:
             user = AttendanceModels.objects.get(user=self.request.user, days=self.days)
-            if user.end == None:
+
+            if user.end is None:
                 user.end = timezone.now()
                 user.save()
+                return redirect('status')
             else:
                 raise forms.ValidationError('すでに登録があります。')
-        
+
+
+        except AttendanceModels.DoesNotExist:
+            # The object does not exist, handle accordingly
+            form.add_error(None, '業務開始が押されていません。')
+            return self.form_invalid(form)
+
         except forms.ValidationError as e:
             # Add the validation error to the form errors
             form.add_error(None, e)
@@ -281,7 +286,7 @@ class EndView(FormView):
             # Return the form to display errors
             return self.form_invalid(form)
 
-        return redirect('status')
+        return render(self.request, 'app/status.html')  # Assuming you want to render 'status.html' after a successful form submission
 
 
 def UpdateStart(request, pk, id):

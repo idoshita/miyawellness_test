@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from allauth.account import views # 追加
 from accounts.forms import ProfileForm, SignupUserForm # 追加
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 
 class SignupView(views.SignupView):
@@ -15,7 +16,20 @@ class SignupView(views.SignupView):
 class LoginView(views.LoginView):
     template_name = 'accounts/login.html'
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        return response
 
+    def get_success_url(self):
+        return reverse('attendance')  # 'attendance'は実際のURLに置き換えてください
+
+    def post(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('attendance')
+
+        return super().post(*args, **kwargs)
+
+    
 class LogoutView(views.LogoutView):
     template_name = 'accounts/logout.html'
 
